@@ -2,7 +2,11 @@ package com.pranay.journalapp;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -10,12 +14,15 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.net.URI;
 
@@ -23,6 +30,7 @@ import Util.JournalUser;
 
 public class AddJournalActivity extends AppCompatActivity {
 
+    private static final int GALLERY_CODE = 1;
     private Button  saveButton;
     private EditText titleEditText,descriptionEditText;
     private TextView currentUserTextview;
@@ -43,7 +51,7 @@ public class AddJournalActivity extends AppCompatActivity {
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private StorageReference storageReference;
     private CollectionReference collectionReference = db.collection("journal");
-    private URI imageUri;
+    private Uri imageUri;
 
 
     @Override
@@ -89,15 +97,43 @@ public class AddJournalActivity extends AppCompatActivity {
         addPhotoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                addPhoto();
+                //Getting image from gallery
+                Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
+                galleryIntent.setType("image/*");
+                startActivityForResult(galleryIntent,GALLERY_CODE);
+
             }
         });
 
     }
 
-    private void addPhoto() {
-    }
 
     private void SaveJournal() {
+        final String title = titleEditText.getText().toString().trim();
+        final String thoughts = descriptionEditText.getText().toString().trim();
+
+        progressBar.setVisibility(View.VISIBLE);
+        if(!TextUtils.isEmpty(title) &&!TextUtils.isEmpty(thoughts) && imageUri !=null){
+            //saving path for  images in firebase
+            final StorageReference filepath = storageReference.child("journal_images")
+                    .child("my_image"+ Timestamp.now().getSeconds());
+
+            //uploading the images
+            filepath.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    filepath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            String imageUrl = uri.toString();
+                            //Creating objects of journal
+
+                        }
+                    })
+
+                }
+            });
+
+        }
     }
 }
