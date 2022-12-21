@@ -49,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
         register = findViewById(R.id.tvRegisterHere);
         emailET = findViewById(R.id.etLoginEmail);
         passET = findViewById(R.id.etLoginPass);
+        firebaseAuth = FirebaseAuth.getInstance();
 
         register.setOnClickListener(v -> {
             Intent i = new Intent(MainActivity.this, RegisterActivity.class);
