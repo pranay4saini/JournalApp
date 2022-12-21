@@ -37,6 +37,9 @@ public class RegisterActivity extends AppCompatActivity {
     private FirebaseAuth.AuthStateListener authStateListener;
     private FirebaseUser currentUser;
 
+
+
+
     //FireStore
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference collectionReference = db.collection("Users");
@@ -49,6 +52,8 @@ public class RegisterActivity extends AppCompatActivity {
         password_create = findViewById(R.id.etRegPass);
         registerButton = findViewById(R.id.btnRegister);
         username_create = findViewById(R.id.etRegUsername);
+
+        firebaseAuth = FirebaseAuth.getInstance();
 
         //Authentication
         authStateListener = new FirebaseAuth.AuthStateListener() {
