@@ -29,7 +29,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.pranay.journalapp.model.Journal;
 
-import java.net.URI;
+
 import java.util.Date;
 
 import Util.JournalUser;
@@ -83,33 +83,22 @@ public class AddJournalActivity extends AppCompatActivity {
             currentUserId = JournalUser.getInstance().getUserId();
             currentUserTextview.setText(currentUsername);
         }
-        authStateListener= new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                user = firebaseAuth.getCurrentUser();
-                if(user != null){
+        authStateListener= firebaseAuth -> {
+            user = firebaseAuth.getCurrentUser();
+            if(user != null){
 
-                }else {
+            }else {
 
-                }
             }
         };
 
-        saveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SaveJournal();
-            }
-        });
-        addPhotoButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //Getting image from gallery
-                Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
-                galleryIntent.setType("image/*");
-                startActivityForResult(galleryIntent,GALLERY_CODE);
+        saveButton.setOnClickListener(v -> SaveJournal());
+        addPhotoButton.setOnClickListener(v -> {
+            //Getting image from gallery
+            Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
+            galleryIntent.setType("image/*");
+            startActivityForResult(galleryIntent,GALLERY_CODE);
 
-            }
         });
 
     }
@@ -126,48 +115,42 @@ public class AddJournalActivity extends AppCompatActivity {
                     .child("my_image"+ Timestamp.now().getSeconds());
 
             //uploading the images
-            filepath.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            filepath.putFile(imageUri).addOnSuccessListener(taskSnapshot -> filepath.getDownloadUrl()
+                    .addOnSuccessListener(new OnSuccessListener<Uri>() {
                 @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    filepath.getDownloadUrl()
-                            .addOnSuccessListener(new OnSuccessListener<Uri>() {
-                        @Override
-                        public void onSuccess(Uri uri) {
-                            String imageUrl = uri.toString();
-                            //Creating objects of journal
-                            Journal journal = new Journal();
-                            journal.setTitle(title);
-                            journal.setThoughts(thoughts);
-                            journal.setImageUrl(imageUrl);
-                            journal.setTimeAdded(new Timestamp(new Date()));
-                            journal.setUserName(currentUsername);
-                            journal.setUserId(currentUserId);
+                public void onSuccess(Uri uri) {
+                    String imageUrl = uri.toString();
+                    //Creating objects of journal
+                    Journal journal = new Journal();
+                    journal.setTitle(title);
+                    journal.setThoughts(thoughts);
+                    journal.setImageUrl(imageUrl);
+                    journal.setTimeAdded(new Timestamp(new Date()));
+                    journal.setUserName(currentUsername);
+                    journal.setUserId(currentUserId);
 
 
-                            //Invoking collection reference
-                            collectionReference.add(journal)
-                                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                        @Override
-                                        public void onSuccess(DocumentReference documentReference) {
-                                            progressBar.setVisibility(View.INVISIBLE);
-                                            startActivity(new Intent(AddJournalActivity.this
-                                                    ,JournalListActivity.class
-                                                    ));
-                                            finish();
-                                        }
-                                    }).addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            Toast.makeText(getApplicationContext(),"Failed: "
-                                                    +e.getMessage(),Toast.LENGTH_SHORT);
-                                        }
-                                    });
-
-                        }
-                    });
+                    //Invoking collection reference
+                    collectionReference.add(journal)
+                            .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                @Override
+                                public void onSuccess(DocumentReference documentReference) {
+                                    progressBar.setVisibility(View.INVISIBLE);
+                                    startActivity(new Intent(AddJournalActivity.this
+                                            ,JournalListActivity.class
+                                            ));
+                                    finish();
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Toast.makeText(getApplicationContext(),"Failed: "
+                                            +e.getMessage(),Toast.LENGTH_SHORT).show();
+                                }
+                            });
 
                 }
-            }).addOnFailureListener(new OnFailureListener() {
+            })).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
                     progressBar.setVisibility(View.VISIBLE);
