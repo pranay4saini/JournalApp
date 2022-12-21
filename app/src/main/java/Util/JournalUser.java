@@ -1,4 +1,4 @@
-package com.pranay.journalapp;
+package Util;
 
 import android.app.Application;
 
@@ -26,5 +26,13 @@ public class JournalUser extends Application {
 
     public void setUsername(String username){
         this.username = username;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 }

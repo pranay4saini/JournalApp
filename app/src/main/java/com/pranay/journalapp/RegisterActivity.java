@@ -24,9 +24,10 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
-import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Objects;
+
+import Util.JournalUser;
 
 public class RegisterActivity extends AppCompatActivity {
     EditText email_create,password_create,username_create;
@@ -118,6 +119,10 @@ public class RegisterActivity extends AppCompatActivity {
                                                          public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                                              if(Objects.requireNonNull(task.getResult().exists())){
                                                                  String name = task.getResult().getString("username");
+                                                                 //getting use of global journal user
+                                                                 JournalUser journalUser = JournalUser.getInstance();
+                                                                 journalUser.setUserId(currentUserId);
+                                                                 journalUser.setUsername(name);
                                                                  //After account is created now going to addjournal activity
                                                                  Intent i = new Intent(RegisterActivity.this
                                                                          , AddJournalActivity.class);
