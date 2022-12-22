@@ -3,5 +3,7 @@
     <string name="title_hint">Title</string>
     <string name="thoughts">Your Thoughts</string>
     <string name="save_button">Save</string>
-    <string name="no_thoughts_hint">Write a Journal Entry by clicking the \\\"+\\\" icon above</string>
+    <string name="no_thoughts_hint">Write a Journal Entry by clicking the + icon above</string>
+    <string name="menu_title">Add thoughts\n</string>
+    <string name="signout">SignOut\n</string>
 </resources>
